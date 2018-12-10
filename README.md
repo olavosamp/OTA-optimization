@@ -1,2 +1,2 @@
 # OTA-optimization
-Solving an circuit design problem with convex optimization
+Solving a circuit design problem with convex optimization
