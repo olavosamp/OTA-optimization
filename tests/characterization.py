@@ -2,7 +2,7 @@ import numpy                    as np
 import pandas                   as pd
 import matplotlib.pyplot        as plt
 
-from functions.cost_function    import transistor_response
+from libs.cost_function    import transistor_response
 
 numPoints = 1e4
 delta = 0
@@ -35,22 +35,22 @@ print(mean)
 # input()
 xMeanIndex = np.squeeze(np.argwhere(np.isclose(y, mean, atol=1e-10)))
 
+span = np.abs(x[-1] - x[0])
 # print(y)
 # print(xMeanIndex)
 # exit()
 print(mean)
 # print(maxVal)
 
-# Get non-zero points
+print("Response Span: ", span)
 
+# Plot response
 plt.plot(x, y, 'b')
 
 # Plot a vertical line through maxVal
 plt.axvline(x=x[xMaxValIndex], color='r')
 
+# Plot horizontal line on mean value
 plt.axhline(y=mean, color='g')
-# Plot a vertical line through Mean
-# for index in xMeanIndex:
-#     plt.axvline(x=x[index], color='g')
 
 plt.show()
