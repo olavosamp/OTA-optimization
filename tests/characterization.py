@@ -8,7 +8,8 @@ import libs.dirs                as dirs
 
 
 numPoints = 1e4
-delta = -0.025
+# delta = -0.025
+delta = 0
 x = np.linspace(-0.2+delta, 0.2+delta, num=numPoints)
 y = transistor_response(x, -delta)
 
@@ -31,26 +32,38 @@ data = {'x': x,
 dataDf = pd.DataFrame(data)
 
 xMaxValIndex  = np.argmax(y)
-print(dataDf['y'].describe())
+print("\n", dataDf['y'].describe())
 
 mean = dataDf.mean(axis=0)['y']
-print(mean)
-# input()
+
 xMeanIndex = np.squeeze(np.argwhere(np.isclose(y, mean, atol=1e-10)))
 
-span = np.abs(x[-1] - x[0])
-# print(y)
-# print(xMeanIndex)
-# exit()
-print(mean)
-# print(maxVal)
+# Filter Bandwidth
+threshold = maxVal*0.2
+bwIndex = np.argwhere(y >= threshold)
 
-print("\nResponse Span: {:5.2e} V".format( span))
+span = np.abs(x[-1] - x[0])
+print("\nResponse Span 0.1%: {:5.2e} V".format( span))
+
+bandwidth = np.squeeze(x[bwIndex[-1]] - x[bwIndex[0]])
+print("Bandwidth: {:12.2e} V".format( bandwidth))
+
 
 # Plot response
 fig = plt.figure(figsize=(20,12))
 plt.plot(x, y, 'b', label='Sinal')
 plt.title("Resposta do Par Diferencial com atraso {:.2e}".format(delta))
+
+# Compute ripple limit points
+dropoff = 0.8*maxVal
+dropoffIndex  = np.argwhere(np.isclose(y, dropoff , atol=1e-11), )
+dropoffLeft   = x[dropoffIndex[0]]
+dropoffRight  = x[dropoffIndex[-1]]
+
+print("Ripple dropoff Left: ", dropoffLeft[0])
+print("Ripple dropoff Right: ", dropoffRight[0])
+
+plt.plot(x[dropoffIndex], y[dropoffIndex], 'rx', label='Pontos de queda do ripple')
 
 # Plot a vertical line through maxVal
 plt.axvline(x=x[xMaxValIndex], color='r', label='Ponto Máximo')
@@ -59,11 +72,6 @@ plt.axvline(x=x[xMaxValIndex], color='r', label='Ponto Máximo')
 plt.axhline(y=mean, color='g', label='Valor Médio')
 
 
-# Filter Bandwidth
-threshold = maxVal*0.2
-bwIndex = np.argwhere(y >= threshold)
-
-bandwidth = np.squeeze(x[bwIndex[-1]] - x[bwIndex[0]])
 
 # Plot bandwidth limits
 plt.axvline(x=x[bwIndex[0] ], color='k', label='Limites de Banda')
@@ -75,12 +83,11 @@ plt.annotate('{:.2e}'.format(np.squeeze(y[xMaxValIndex])), xy=(x[xMaxValIndex], 
               xytext=(2,4), textcoords='offset points')
 plt.annotate('{:.2e}'.format(np.squeeze(y[xMeanIndex[0]])), xy=(x[xMeanIndex[0]], y[xMeanIndex[0]]),
               xytext=(100,4), textcoords='offset points')
-plt.annotate('{:.2e}'.format(np.squeeze(y[bwIndex[0]])), xy=(x[bwIndex[0]], y[bwIndex[0]]),
+plt.annotate('{:.2e}'.format(np.squeeze(x[bwIndex[0]])), xy=(x[bwIndex[0]], y[bwIndex[0]]),
               xytext=(-48,0), textcoords='offset points')
-plt.annotate('{:.2e}'.format(np.squeeze(y[bwIndex[-1]])), xy=(x[bwIndex[-1]], y[bwIndex[-1]]),
+plt.annotate('{:.2e}'.format(np.squeeze(x[bwIndex[-1]])), xy=(x[bwIndex[-1]], y[bwIndex[-1]]),
               xytext=(2,0), textcoords='offset points')
 
-print("Bandwidth: {:12.2e} V".format( bandwidth))
 
 plt.savefig(dirs.figures+"response_characterization.png", orientation='portrait',
             bbox_inches='tight')
