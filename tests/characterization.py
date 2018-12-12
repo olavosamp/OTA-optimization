@@ -20,8 +20,8 @@ dataDf = pd.DataFrame(data)
 maxVal = dataDf.max()['y']
 
 # Filter very small values
-threshold = maxVal*0.001
-newYIndex = np.argwhere(y >= threshold)
+thresholdBW = maxVal*0.001
+newYIndex = np.argwhere(y >= thresholdBW)
 y = np.squeeze(y[newYIndex])
 x = np.squeeze(x[newYIndex])
 
@@ -39,8 +39,8 @@ mean = dataDf.mean(axis=0)['y']
 xMeanIndex = np.squeeze(np.argwhere(np.isclose(y, mean, atol=1e-10)))
 
 # Filter Bandwidth
-threshold = maxVal*0.2
-bwIndex = np.argwhere(y >= threshold)
+thresholdBW = 0.8*maxVal
+bwIndex = np.argwhere(y >= thresholdBW)
 
 span = np.abs(x[-1] - x[0])
 print("\nResponse Span 0.1%: {:5.2e} V".format( span))
@@ -58,7 +58,7 @@ plt.ylabel("Transcondutância (gm)")
 
 
 # Compute ripple limit points
-dropoff = 0.8*maxVal
+dropoff = thresholdBW
 dropoffIndex  = np.argwhere(np.isclose(y, dropoff , atol=1e-11), )
 dropoffLeft   = x[dropoffIndex[0]]
 dropoffRight  = x[dropoffIndex[-1]]
@@ -74,22 +74,24 @@ plt.axvline(x=x[xMaxValIndex], color='r', label='Ponto Máximo')
 # Plot horizontal line over mean value
 plt.axhline(y=mean, color='g', label='Valor Médio')
 
-
-
 # Plot bandwidth limits
-plt.axvline(x=x[bwIndex[0] ], color='k', label='Limites de Banda')
-plt.axvline(x=x[bwIndex[-1]], color='k')
+plt.axvline(x=x[dropoffIndex[0] ], color='k', label='Limites de Banda')
+plt.axvline(x=x[dropoffIndex[-1]], color='k')
 plt.legend()
 
 # Annotations
+# Max value point
 plt.annotate('{:.2e}'.format(np.squeeze(y[xMaxValIndex])), xy=(x[xMaxValIndex], y[xMaxValIndex]),
               xytext=(2,4), textcoords='offset points')
+# Mean value line
 plt.annotate('{:.2e}'.format(np.squeeze(y[xMeanIndex[0]])), xy=(x[xMeanIndex[0]], y[xMeanIndex[0]]),
               xytext=(100,4), textcoords='offset points')
-plt.annotate('{:.2e}'.format(np.squeeze(x[bwIndex[0]])), xy=(x[bwIndex[0]], y[bwIndex[0]]),
-              xytext=(-48,0), textcoords='offset points')
-plt.annotate('{:.2e}'.format(np.squeeze(x[bwIndex[-1]])), xy=(x[bwIndex[-1]], y[bwIndex[-1]]),
-              xytext=(2,0), textcoords='offset points')
+# Left ripple point
+plt.annotate('x = {:.2e}'.format(np.squeeze(x[bwIndex[0]])), xy=(x[bwIndex[0]], y[bwIndex[0]]),
+              xytext=(-68,0), textcoords='offset points')
+# Right ripple point
+plt.annotate('x = {:.2e}'.format(np.squeeze(x[bwIndex[-1]])), xy=(x[bwIndex[-1]], y[bwIndex[-1]]),
+              xytext=(4,0), textcoords='offset points')
 
 
 plt.savefig(dirs.figures+"response_characterization.png", orientation='portrait',
