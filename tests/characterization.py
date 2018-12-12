@@ -53,6 +53,9 @@ print("Bandwidth: {:12.2e} V".format( bandwidth))
 fig = plt.figure(figsize=(20,12))
 plt.plot(x, y, 'b', label='Sinal')
 plt.title("Resposta do Par Diferencial com atraso {:.2e}".format(delta))
+plt.xlabel("Tensão (V)")
+plt.ylabel("Transcondutância (gm)")
+
 
 # Compute ripple limit points
 dropoff = 0.8*maxVal
@@ -68,7 +71,7 @@ plt.plot(x[dropoffIndex], y[dropoffIndex], 'rx', label='Pontos de queda do rippl
 # Plot a vertical line through maxVal
 plt.axvline(x=x[xMaxValIndex], color='r', label='Ponto Máximo')
 
-# Plot horizontal line on mean value
+# Plot horizontal line over mean value
 plt.axhline(y=mean, color='g', label='Valor Médio')
 
 

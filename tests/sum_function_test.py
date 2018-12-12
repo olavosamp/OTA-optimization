@@ -2,7 +2,7 @@ import numpy                    as np
 import pandas                   as pd
 import matplotlib.pyplot        as plt
 
-from libs.cost_function         import sum_function
+from libs.cost_function         import sum_function, cost_function
 import libs.defines             as defs
 import libs.dirs                as dirs
 
@@ -18,7 +18,6 @@ pointDensity = 1e4/(0.4)
 
 
 x = np.linspace(lowerBound, upperBound, num=round(pointDensity*span))
-
 y = sum_function(x, delta, M=M)
 
 print("x ", x.shape)
@@ -43,10 +42,11 @@ yBW = y[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
 xBW = x[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
 
 plt.plot(xBW,yBW)
-plt.show()
+# plt.show()
 
 ripple = np.max(yBW) - np.min(yBW)
 
 print("Bandwidth: ", bandwidth)
 print("Ripple: ", ripple)
 print("f_0(delta) = ", ripple - bandwidth)
+print("Cost function: ", cost_function(delta))
