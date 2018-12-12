@@ -6,7 +6,7 @@ from libs.cost_function         import sum_function, cost_function
 import libs.defines             as defs
 import libs.dirs                as dirs
 
-M       = 17               # Number of transistor responses
+M       = 17               # Number of differential pairs
 span    = 0.08             # Non-zero response width
 spacing = span/2
 edge    = (M-1)/2*spacing
@@ -47,11 +47,10 @@ print("Limit Right: ", x[dropIndex[-1]])
 print("Limit Left  Defs: ", defs.RIPPLE_DROPOFF_LEFT)
 print("Limit Right Defs: ", defs.RIPPLE_DROPOFF_RIGHT)
 print("")
-# input()
+
 print("Bandwidth: ", bandwidth)
 print("Ripple: ", ripple)
 print("f_0(delta) = ", ripple - bandwidth)
 print("Cost function: ", cost_function(delta))
 
-# plt.show()
 plt.savefig(dirs.figures+"response_sum.png")

@@ -2,7 +2,8 @@ import numpy as np
 import libs.defines             as defs
 import matplotlib.pyplot as plt
 
-def transistor_response(x, delta):
+
+def differential_pair_response(x, delta):
     Ib = 1e-9
     n = 1.3
     phiT = 26*1e-3
@@ -12,15 +13,17 @@ def transistor_response(x, delta):
 
     return (Ib/(n*phiT))*arg1/(1 + arg2)
 
+
 def sum_function(x, delta, M=6):
     assert len(delta) == M, "Delta vector must be of same length as the number \
     of transistor responses"
 
     response = np.zeros((x.shape[0], M))
     for i in range(M):
-        response[:,i] = transistor_response(x, delta[i])
+        response[:,i] = differential_pair_response(x, delta[i])
 
     return np.sum(response, axis=1)
+
 
 def cost_function(delta):
     M          = defs.NUM_DIFFERENTIAL_PAIRS

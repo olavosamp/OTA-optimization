@@ -2,16 +2,16 @@ import numpy                    as np
 import pandas                   as pd
 import matplotlib.pyplot        as plt
 
-from libs.cost_function    import transistor_response
+from libs.cost_function         import differential_pair_response
 import libs.defines             as defs
 import libs.dirs                as dirs
 
 
 numPoints = 1e4
 # delta = -0.025
-delta = 0
+delta = -defs.DISTANCE_TO_MAX
 x = np.linspace(-0.2+delta, 0.2+delta, num=numPoints)
-y = transistor_response(x, -delta)
+y = differential_pair_response(x, -delta)
 
 data = {'x': x,
         'y': y}
@@ -31,12 +31,17 @@ data = {'x': x,
 
 dataDf = pd.DataFrame(data)
 
-xMaxValIndex  = np.argmax(y)
 print("\n", dataDf['y'].describe())
 
 mean = dataDf.mean(axis=0)['y']
 
-xMeanIndex = np.squeeze(np.argwhere(np.isclose(y, mean, atol=1e-10)))
+xMaxValIndex = np.argmax(y)
+xMeanIndex   = np.squeeze(np.argwhere(np.isclose(y, mean, atol=1e-10)))
+
+# Compute distance from delta to max value
+distToMax = np.abs(x[xMaxValIndex] - 0)
+print("Distance to max: ", distToMax)
+input()
 
 # Filter Bandwidth
 thresholdBW = 0.8*maxVal
@@ -52,7 +57,7 @@ print("Bandwidth: {:12.2e} V".format( bandwidth))
 # Plot response
 fig = plt.figure(figsize=(20,12))
 plt.plot(x, y, 'b', label='Sinal')
-plt.title("Resposta do Par Diferencial com atraso {:.2e}".format(delta))
+plt.title("Resposta do Par Diferencial com deslocamento {:.2e}".format(delta))
 plt.xlabel("Tensão (V)")
 plt.ylabel("Transcondutância (gm)")
 
