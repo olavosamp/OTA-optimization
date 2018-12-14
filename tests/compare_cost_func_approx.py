@@ -31,7 +31,6 @@ plt.xlabel("Tensão (V)")
 plt.ylabel("Transcondutância (gm)")
 
 # Compute dropoff as x where f(x) is 80% of max(y)
-
 dropoff       = 0.8*np.max(y)
 dropoffIndex  = np.squeeze(np.argwhere(np.isclose(y, dropoff , atol=1e-9)))
 dropoffLeft   = dropoffIndex[0]

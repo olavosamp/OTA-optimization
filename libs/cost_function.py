@@ -51,7 +51,7 @@ def cost_function_exact(delta):
     # Compute ripple
     ripple = np.max(y) - np.min(y)
 
-    return ripple - bandwidth, ripple, bandwidth
+    return ripple - bandwidth
 
 
 def cost_function(delta):
@@ -92,4 +92,4 @@ def cost_function(delta):
     bandwidth  =  rightBound - leftBound
     assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
 
-    return ripple - bandwidth, ripple, bandwidth
+    return ripple - bandwidth
