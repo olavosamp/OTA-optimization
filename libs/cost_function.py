@@ -24,46 +24,72 @@ def sum_function(x, delta, M=6):
 
     return np.sum(response, axis=1)
 
+def cost_function_exact(delta):
+    M         = defs.NUM_DIFFERENTIAL_PAIRS
+    leftEdge  = delta[0]-0.5
+    rightEdge = delta[-1]+0.5
+    span      = rightEdge - leftEdge
 
-def cost_function(delta):
-    M          = defs.NUM_DIFFERENTIAL_PAIRS
-    leftBound  = delta[0]-0.5
-    rightBound = delta[-1]+0.5
-    span       = rightBound - leftBound
-
-
-    x = np.linspace(leftBound, rightBound, num=round(defs.PLOT_POINT_DENSITY*span))
+    x = np.linspace(leftEdge, rightEdge, num=round(defs.PLOT_POINT_DENSITY*span))
     y = sum_function(x, delta, M=M)
 
     dropoff       = 0.8*np.max(y)
     dropoffIndex  = np.squeeze(np.argwhere(np.isclose(y, dropoff , atol=1e-9)))
+    dropoffLeft   = dropoffIndex[0]
+    dropoffRight  = dropoffIndex[-1]
+
     leftBound     = np.squeeze(x[dropoffIndex])[0]
     rightBound    = np.squeeze(x[dropoffIndex])[-1]
+
+    x = x[dropoffLeft:dropoffRight]
+    y = y[dropoffLeft:dropoffRight]
 
     # Compute bandwidth
     bandwidth  =  rightBound - leftBound
     assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
 
-    x = x[dropoffIndex[0]:dropoffIndex[-1]]
-    y = y[dropoffIndex[0]:dropoffIndex[-1]]
+    # Compute ripple
+    ripple = np.max(y) - np.min(y)
 
-    maxIndex = np.argmax(y)
-    minIndex = np.argmin(y)
-    plt.plot(x[maxIndex], y[maxIndex], 'rx')
-    plt.plot(x[minIndex], y[minIndex], 'r*')
-    # fig = plt.figure()
-    plt.plot(x, y)
-    print(y[maxIndex] == np.max(y))
+    return ripple - bandwidth, ripple, bandwidth
 
-    # plt.axvline(x=delta[0]  -defs.RIPPLE_DROPOFF_LEFT, color='k', label='Limites de Banda')
-    # plt.axvline(x=delta[-1] +defs.RIPPLE_DROPOFF_RIGHT, color='k')
-    plt.axvline(x=leftBound,  color='r', label='Limites de Banda')
-    plt.axvline(x=rightBound, color='r')
-    plt.show()
+
+def cost_function(delta):
+    M          = defs.NUM_DIFFERENTIAL_PAIRS
+    leftEdge   = delta[0]-0.5
+    rightEdge  = delta[-1]+0.5
+    span       = rightEdge - leftEdge
+
+    x = np.linspace(leftEdge, rightEdge, num=round(defs.PLOT_POINT_DENSITY*span))
+    y = sum_function(x, delta, M=M)
+
+    dropoffLeft  = np.squeeze(np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[0],
+                              atol=1e-5)))
+    dropoffRight = np.squeeze(np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[-1],
+                              atol=1e-5)))
+    leftBound   = x[dropoffLeft]
+    rightBound  = x[dropoffRight]
+
+    x = x[dropoffLeft:dropoffRight]
+    y = y[dropoffLeft:dropoffRight]
+
+    # maxIndex = np.argmax(y)
+    # minIndex = np.argmin(y)
+    # plt.plot(x[maxIndex], y[maxIndex], 'rx')
+    # plt.plot(x[minIndex], y[minIndex], 'r*')
+    # plt.plot(x, y)
+    #
+    # plt.axvline(x=leftBound, color='k', label='Limites de Banda Delta')
+    # plt.axvline(x=rightBound, color='k')
+    # plt.axvline(x=leftBound,  color='r', label='Limites de Banda 80%')
+    # plt.axvline(x=rightBound, color='r')
+    # plt.show()
 
     # Compute ripple
     ripple = np.max(y) - np.min(y)
-    print("Bandwidth: ", bandwidth)
-    print("Ripple: ", ripple)
 
-    return ripple - bandwidth
+    # Compute bandwidth
+    bandwidth  =  rightBound - leftBound
+    assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
+
+    return ripple - bandwidth, ripple, bandwidth
