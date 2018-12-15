@@ -11,8 +11,14 @@ def differential_pair_response(x, delta):
     response = np.zeros(np.shape(x)[0])
     index = (x + delta <= 10*defs.SIGNAL_SPAN)
 
-    arg1 = np.exp((x[index] + delta)/(n*phiT))
-    arg2 = np.exp(((x[index] + delta)/(n*phiT))**2)
+    # Hopefully numerically stable expression
+    arg1 = 1
+    arg2 = np.exp(-(x[index] + delta)/(n*phiT)) + \
+           np.exp(((x[index] + delta)/(n*phiT))**2 - (x[index] + delta)/(n*phiT))
+
+    # Original expression
+    # arg1 = np.exp((x[index] + delta)/(n*phiT))
+    # arg2 = np.exp(((x[index] + delta)/(n*phiT))**2)
 
     response[index] = (Ib/(n*phiT))*arg1/(1 + arg2)
 
@@ -74,8 +80,8 @@ def cost_function_exact(delta):
     return ripple - bandwidth
 
 
-def cost_function(deltaDiffs):
-    delta = convert_delta(deltaDiffs)
+def cost_function(deltaDiff):
+    delta = convert_delta(deltaDiff)
 
     M          = defs.NUM_DIFFERENTIAL_PAIRS
     leftEdge   = delta[0]-0.5
@@ -161,13 +167,14 @@ def cost_function(deltaDiffs):
     return 1e8*ripple - bandwidth
 
 
-def convert_delta(deltaDiffs):
-    deltaLen = len(deltaDiffs)
+def convert_delta(deltaDiff):
+    deltaDiff[0:] = np.clip(deltaDiff[0:], defs.MIN_DELTA_DIFF_VALUE, None)
+
+    deltaLen = len(deltaDiff)
     delta = np.zeros(deltaLen)
-    delta[0] = deltaDiffs[0]
+    delta[0] = deltaDiff[0]
 
     for i in range(1, deltaLen):
-        delta[i] = delta[i-1] + np.abs(deltaDiffs[i])
-        # print()
+        delta[i] = delta[i-1] + np.abs(deltaDiff[i])
 
     return delta

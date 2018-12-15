@@ -8,16 +8,9 @@ import libs.dirs                as dirs
 
 M       = defs.NUM_DIFFERENTIAL_PAIRS   # Number of differential pairs
 span    = defs.SIGNAL_SPAN              # Non-zero response width
-spacing = 200*span/2
-edge    = (M-1)/2*spacing
+# spacing = 200*span/2
+# edge    = (M-1)/2*spacing
 # delta   = np.linspace(-edge,edge, num=M)
-
-# deltaDiff = np.zeros(M)
-# deltaDiff[0] = -edge
-# for i in range(1,M):
-#     deltaDiff[i] = spacing
-# print(deltaDiff)
-# input()
 
 # deltaDiff = [0.6053946, 0.5, 0.5, 0.5]
 deltaDiff = [-1.5]
@@ -29,9 +22,7 @@ delta = convert_delta(deltaDiff)
 lowerBound = delta[0]  -2*span
 upperBound = delta[-1] +2*span
 pointDensity = defs.PLOT_POINT_DENSITY
-
 numPoints = round(pointDensity*(upperBound-lowerBound))
-x, step = np.linspace(lowerBound, upperBound, num=numPoints, retstep=True)
 
 x = np.linspace(lowerBound, upperBound, num=int(1e6))
 y = sum_function(x, delta, M=M)
@@ -44,7 +35,6 @@ print(upperBound)
 fig = plt.figure(figsize=(30,16))
 plt.plot(x,y)
 plt.xlim(lowerBound-span, upperBound+span)
-# plt.xlim(-0.04, 1.0)
 
 plt.xlabel("Tensão (V)")
 plt.ylabel("Transcondutância (gm)")
@@ -53,10 +43,6 @@ plt.show()
 # Obtain Cost function parameters
 maxVal    = np.max(y)
 dropIndex = np.argwhere(y > 0.8*maxVal)
-# print()
-# print(maxVal)
-# print(dropIndex)
-# exit()
 bandwidth = np.squeeze(x[dropIndex[-1]] - x[dropIndex[0]])
 yBW = y[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
 xBW = x[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]

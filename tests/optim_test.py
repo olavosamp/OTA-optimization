@@ -20,7 +20,7 @@ M = defs.NUM_DIFFERENTIAL_PAIRS
 # ]
 bounds = [(-3.,3.)]
 for i in range(1,M):
-    bounds.append((0,0.5))
+    bounds.append((0,defs.SIGNAL_SPAN))
 
 # deltaTest = [ 4.6067978,   4.72363884,  4.34032225, -1.10735863]
 # # print
