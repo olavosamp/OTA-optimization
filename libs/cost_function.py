@@ -244,7 +244,7 @@ def cost_function_alt(deltaDiff):
 
 
 def convert_delta(deltaDiff):
-    deltaDiff[0:] = np.clip(deltaDiff[0:], defs.MIN_DELTA_DIFF_VALUE, None)
+    deltaDiff[1:] = np.clip(deltaDiff[1:], defs.MIN_DELTA_DIFF_VALUE, None)
 
     deltaLen = len(deltaDiff)
     delta = np.zeros(deltaLen)
