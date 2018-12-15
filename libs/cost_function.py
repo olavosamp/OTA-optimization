@@ -87,18 +87,9 @@ def cost_function(deltaDiff):
     leftEdge   = delta[0]-0.5
     rightEdge  = delta[-1]+0.5
     span       = rightEdge - leftEdge
-    # print(delta)
-    # print(leftEdge)
-    # print(rightEdge)
-    # input()
 
     x = np.linspace(leftEdge, rightEdge, num=round(defs.PLOT_POINT_DENSITY*span))
     y = sum_function(x, delta, M=M)
-    # print("X Span:")
-    # print(x[0], x[-1])
-    # print("Step: {:.2e}".format(x[0]-x[1]))
-    # print("Y Sum: ",np.sum(y))
-    # input()
 
     dropoffLeft  = []
     dropoffRight = []
@@ -137,9 +128,10 @@ def cost_function(deltaDiff):
     #     print(resp)
     #     print(np.sum(resp))
     #     plt.plot(x, resp)
-
-    x = x[dropoffLeft:dropoffRight]
-    y = y[dropoffLeft:dropoffRight]
+    # xBW = np.zeros(np.shape(x[dropoffLeft:dropoffRight]))
+    # xBW = x[dropoffLeft:dropoffRight]
+    yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
+    yBW = y[dropoffLeft:dropoffRight]
 
     # maxIndex = np.argmax(y)
     # minIndex = np.argmin(y)
@@ -154,7 +146,7 @@ def cost_function(deltaDiff):
     # plt.show()
 
     # Compute ripple
-    ripple = np.max(y) - np.min(y)
+    ripple = np.max(yBW) - np.min(yBW)
 
     # Compute bandwidth
     bandwidth  =  rightBound - leftBound
@@ -164,7 +156,54 @@ def cost_function(deltaDiff):
     # print(bandwidth)
     # print(ripple)
     # input()
+
+    del x, y, yBW
     return 1e8*ripple - bandwidth
+
+def cost_function_alt(deltaDiff):
+    delta = convert_delta(deltaDiff)
+    M       = np.shape(delta)[0]   # Number of differential pairs
+    span    = defs.SIGNAL_SPAN              # Non-zero response width
+
+    lowerBound   = delta[0]  -2*span
+    upperBound   = delta[-1] +2*span
+    pointDensity = defs.PLOT_POINT_DENSITY
+    numPoints    = int(np.clip(pointDensity*(upperBound-lowerBound), 2**20+1, 2**25+1))
+
+    x, step   = np.linspace(lowerBound, upperBound, num=numPoints, retstep=True)
+    y = np.zeros(np.shape(x))
+
+    # Compute differential pair response centered on zero
+    yZero = differential_pair_response(x, 0)
+
+    # Rotate response back to center it on lowerBound
+    correctIndex = int(round((0+lowerBound)/step))
+    yZero = np.roll(yZero, correctIndex)
+
+    # Compute responses centered on each delta_i
+    indexDiff = np.zeros(M)
+    for i in range(M):
+        if i == 0:
+            indexDiff[i] = (delta[i] - lowerBound)
+        else:
+            indexDiff[i] = delta[i] - delta[i-1]
+        indexDiff[i] = round(int((indexDiff[i])/step))
+
+        yComp = np.roll(yZero, int(sum(indexDiff[:i+1])))
+        y += yComp
+
+    # Obtain Cost function parameters
+    maxVal    = np.max(y)
+    dropIndex = np.argwhere(y > 0.8*maxVal)
+
+    bandwidth = np.squeeze(x[dropIndex[-1]] - x[dropIndex[0]])
+    yBW = y[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
+    xBW = x[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
+
+
+    ripple = np.max(yBW) - np.min(yBW)
+    del x, y, xBW, yBW, yZero, yComp
+    return ripple*1e8 - bandwidth
 
 
 def convert_delta(deltaDiff):

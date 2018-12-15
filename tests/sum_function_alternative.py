@@ -9,14 +9,17 @@ import libs.dirs                as dirs
 
 M       = defs.NUM_DIFFERENTIAL_PAIRS   # Number of differential pairs
 span    = defs.SIGNAL_SPAN              # Non-zero response width
-# spacing = 200*span/2
-# edge    = (M-1)/2*spacing
 
 # deltaDiff = [0.6053946, 0.5, 0.5, 0.5]
-deltaDiff = [-1.5]
+deltaDiff = [0.09247358]
 for i in range(1, M):
-    deltaDiff.append(span/8)
-deltaDiff[-2] = span/2
+    deltaDiff.append(0.4)
+# deltaDiff[-2] = span/2
+
+# result = cost_function_alt(deltaDiff)
+result = cost_function(deltaDiff)
+print(result)
+exit()
 
 delta = convert_delta(deltaDiff)
 
@@ -56,7 +59,6 @@ for i in range(M):
 
 plt.plot(x, y)
 plt.show()
-exit()
 
 print("x ", x.shape)
 print("y ", y.shape)

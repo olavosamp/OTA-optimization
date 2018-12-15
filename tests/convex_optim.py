@@ -13,24 +13,38 @@ import libs.dirs            as dirs
 M = defs.NUM_DIFFERENTIAL_PAIRS
 
 ## SCIPY
-# bounds = [(-3.,3.),
-#           (0,0.5),
-#           (0,0.5),
-#           (0,0.5),
-# ]
-bounds = [(-3.,3.)]
-for i in range(1,M):
-    bounds.append((0,defs.SIGNAL_SPAN))
+# Inequality constraints in form
+# f_i(x) >= 0
+# INEQUALITIES TO IMPLEMENT
+#     deltaDiffs[0]  in [-3, 3]
+#     deltaDiffs[1:] in [0, defs.SIGNAL_SPAN]
+#     ripple         <= 0.05
+#     bandwidth      in [0.7, 0.9]
+constraints = [
+               {'type':'ineq', # deltaDiff[0] >= -3
+                 'fun': lambda x: x[0] +3.
+                 },
+               {'type':'ineq', # deltaDiff[0] <= 3
+                'fun': lambda x: x[0] -3.
+                },
+               {'type':'ineq', # deltaDiff[1:] >= 0
+                'fun': lambda x: x[1:]
+                },
+               {'type':'ineq', # deltaDiff[1:] <= defs.SIGNAL_SPAN
+                'fun': lambda x: x[1:] - defs.SIGNAL_SPAN
+                },
+               # {'type':'ineq',
+               #  'fun':, lambda x:
+               #  },
+]
 
-# deltaTest = [ 4.6067978,   4.72363884,  4.34032225, -1.10735863]
-# # print
-# print(cost_function(deltaTest))
-# exit()
+# Initialize variables
+deltaDiff0 = np.zeros(M)
+deltaDiff0[0] = np.random.random()*(3 +3) - 3
+deltaDiff0[1:] = np.random.random(M-1)*(defs.SIGNAL_SPAN - 0) + 0
 
-def call_func(xk, convergence=0):
-    print("Delta: ", xk)
-    print("f(x): {:.2e}\n".format(cost_function(xk)))
-result = spo.differential_evolution(cost_function, bounds, disp=True, callback=call_func)
+opts = {'disp':True}
+result = spo.minimize(cost_function, deltaDiff0, constraints=constraints, options=opts)
 print(result.x)
 print(result.nfev)
 

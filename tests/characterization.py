@@ -10,13 +10,11 @@ import libs.dirs                as dirs
 numPoints = defs.PLOT_POINT_DENSITY
 delta = 100
 # delta = -defs.DISTANCE_TO_MAX-10
-# delta = 0.6053946
 x = np.linspace(-0.2+delta, 0.2+delta, num=numPoints)
 y = differential_pair_response(x, -delta)
 
 print("Step: {:.2e}".format(x[0]-x[1]))
 print("Y Sum: ",np.sum(y))
-# input()
 
 data = {'x': x,
         'y': y}
