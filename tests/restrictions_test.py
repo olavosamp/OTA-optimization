@@ -43,34 +43,18 @@ deltaDiff0 = np.zeros(M)
 deltaDiff0[0] = np.random.random()*(3 +3) - 3
 deltaDiff0[1:] = np.random.random(M-1)*(defs.SIGNAL_SPAN - 0) + 0
 
-opts = {'disp':True}
-def call_func(xk, convergence=0):
-    print("Delta: ", xk)
-    print("")
-    # print("f(x): {:.2e}\n".format(cost_function(xk)))
-result = spo.minimize(cost_function, deltaDiff0, constraints=constraints, options=opts
-                        callback=call_func)
-print(result.x)
-print(result.f)
-print(result.nfev)
+print(deltaDiff0)
+for cons in constraints:
+    func = cons['fun']
+    print(func(deltaDiff0) >= 0)
 
-## CVXPY
-# Construct the problem.
-# delta = cp.Variable(M)
-# expr = cp.expressions.expression.Expression(cost_function_exact(delta))
-# print(expr.is_convex())
-# # input()
-# objective = cp.problems.objective.Minimize(cost_function_exact(delta))
-# constraints = [(delta >= -5), # Operators are elementwise
-#                (delta <= 5 )
-#                ]
-# prob = cp.Problem(objective, constraints)
-#
-# # The optimal objective value is returned by `prob.solve()`.
-# result = prob.solve()
-# # The optimal value for x is stored in `x.value`.
-# print(prob.status)
-# print(delta.value)
-# # The optimal Lagrange multiplier for a constraint is stored in
-# # `constraint.dual_value`.
-# print(constraints[0].dual_value)
+# opts = {'disp':True}
+# def call_func(xk, convergence=0):
+#     print("Delta: ", xk)
+#     print("")
+#     # print("f(x): {:.2e}\n".format(cost_function(xk)))
+# result = spo.minimize(cost_function, deltaDiff0, constraints=constraints, options=opts
+#                         callback=call_func)
+# print(result.x)
+# print(result.f)
+# print(result.nfev)

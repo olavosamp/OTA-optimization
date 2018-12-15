@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 
 def differential_pair_response(x, delta):
-    Ib = 1e-9
-    n = 1.3
+    Ib   = 1e-9
+    n    = 1.3
     phiT = 26*1e-3
 
     response = np.zeros(np.shape(x)[0])
@@ -13,8 +13,8 @@ def differential_pair_response(x, delta):
 
     # Hopefully numerically stable expression
     arg1 = 1
-    arg2 = np.exp(-(x[index] + delta)/(n*phiT)) + \
-           np.exp(((x[index] + delta)/(n*phiT))**2 - (x[index] + delta)/(n*phiT))
+    w = (x[index] + delta)/(n*phiT)
+    arg2 = np.exp(-w) + np.exp(w**2 -w)
 
     # Original expression
     # arg1 = np.exp((x[index] + delta)/(n*phiT))
@@ -22,16 +22,12 @@ def differential_pair_response(x, delta):
 
     response[index] = (Ib/(n*phiT))*arg1/(1 + arg2)
 
-    # arg1 = np.exp((x + delta)/(n*phiT))
-    # arg2 = np.exp(((x + delta)/(n*phiT))**2)
-    #
-    # response = (Ib/(n*phiT))*arg1/(1 + arg2)
-
     # if np.isnan(response).any():
-    #     print("Delta causing error: ", delta)
-    #     print(x[np.isnan(response)] + delta)
-    #     print(x[np.isnan(response)][10000] + delta)
-    #     input()
+        # print("Delta causing error: ", delta)
+        # print(x[np.isnan(response)] + delta)
+        # print(x[np.isnan(response)][10000] + delta)
+        # input()
+        # return
     return response
 
 

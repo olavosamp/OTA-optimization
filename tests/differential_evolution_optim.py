@@ -19,14 +19,17 @@ for i in range(1,M):
 
 def call_func(xk, convergence=0):
     print("Delta: ", xk)
+    print("")
     # print("f(x): {:.2e}\n".format(cost_function(xk)))
 result = spo.differential_evolution(cost_function_alt, bounds, disp=True, callback=call_func)
 print(result.x)
+print(result.f)
 print(result.nfev)
 
 ## Result DE
 # x* = [0.09247358, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
 # f(x*) = -6.29
+# FEvals
 
 
 ## CVXPY
