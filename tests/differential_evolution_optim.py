@@ -19,8 +19,8 @@ for i in range(1,M):
 
 def call_func(xk, convergence=0):
     print("Delta: ", xk)
-    print("f(x): {:.2e}\n".format(cost_function(xk)))
-result = spo.differential_evolution(cost_function, bounds, disp=True, callback=call_func)
+    # print("f(x): {:.2e}\n".format(cost_function(xk)))
+result = spo.differential_evolution(cost_function_alt, bounds, disp=True, callback=call_func)
 print(result.x)
 print(result.nfev)
 

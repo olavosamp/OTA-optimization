@@ -44,7 +44,11 @@ deltaDiff0[0] = np.random.random()*(3 +3) - 3
 deltaDiff0[1:] = np.random.random(M-1)*(defs.SIGNAL_SPAN - 0) + 0
 
 opts = {'disp':True}
-result = spo.minimize(cost_function, deltaDiff0, constraints=constraints, options=opts)
+def call_func(xk, convergence=0):
+    print("Delta: ", xk)
+    print("f(x): {:.2e}\n".format(cost_function(xk)))
+result = spo.minimize(cost_function, deltaDiff0, constraints=constraints, options=opts
+                        callback=call_func)
 print(result.x)
 print(result.nfev)
 

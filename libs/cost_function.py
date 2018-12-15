@@ -119,19 +119,20 @@ def cost_function(deltaDiff):
     leftBound  = x[dropoffLeft]
     rightBound = x[dropoffRight]
 
-    # fig = plt.figure(figsize=(20,10))
-    # plt.plot(x,y)
-    # print("\nResponses")
-    # for deltai in delta:
-    #     resp = differential_pair_response(x, deltai)
-    #     print(deltai)
-    #     print(resp)
-    #     print(np.sum(resp))
-    #     plt.plot(x, resp)
     # xBW = np.zeros(np.shape(x[dropoffLeft:dropoffRight]))
     # xBW = x[dropoffLeft:dropoffRight]
     yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
     yBW = y[dropoffLeft:dropoffRight]
+
+    fig = plt.figure(figsize=(20,10))
+    plt.plot(x,y)
+    print("\nResponses")
+    for deltai in delta:
+        resp = differential_pair_response(x, deltai)
+        print(deltai)
+        print(resp)
+        print(np.sum(resp))
+        plt.plot(x, resp)
 
     # maxIndex = np.argmax(y)
     # minIndex = np.argmin(y)
@@ -139,8 +140,8 @@ def cost_function(deltaDiff):
     # plt.plot(x[minIndex], y[minIndex], 'r*')
     # plt.plot(x, y)
 
-    # plt.axvline(x=leftBound, color='k', label='Limites de Banda Delta')
-    # plt.axvline(x=rightBound, color='k')
+    plt.axvline(x=leftBound, color='k', label='Limites de Banda Delta')
+    plt.axvline(x=rightBound, color='k')
     # plt.axvline(x=leftBound,  color='r', label='Limites de Banda 80%')
     # plt.axvline(x=rightBound, color='r')
     # plt.show()
@@ -153,8 +154,9 @@ def cost_function(deltaDiff):
     assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
     # print(x)
     # print(y)
-    # print(bandwidth)
-    # print(ripple)
+    print("\nRegular")
+    print("bandwidth: ", bandwidth)
+    print("ripple: ", ripple)
     # input()
 
     del x, y, yBW
@@ -165,26 +167,26 @@ def cost_function_alt(deltaDiff):
     M       = np.shape(delta)[0]   # Number of differential pairs
     span    = defs.SIGNAL_SPAN              # Non-zero response width
 
-    lowerBound   = delta[0]  -2*span
-    upperBound   = delta[-1] +2*span
+    lowerEdge   = delta[0]  -2*span
+    upperEdge   = delta[-1] +2*span
     pointDensity = defs.PLOT_POINT_DENSITY
-    numPoints    = int(np.clip(pointDensity*(upperBound-lowerBound), 2**20+1, 2**25+1))
+    numPoints    = int(np.clip(pointDensity*(upperEdge-lowerEdge), 2**20+1, 2**25+1))
 
-    x, step   = np.linspace(lowerBound, upperBound, num=numPoints, retstep=True)
+    x, step   = np.linspace(lowerEdge, upperEdge, num=numPoints, retstep=True)
     y = np.zeros(np.shape(x))
 
     # Compute differential pair response centered on zero
     yZero = differential_pair_response(x, 0)
 
     # Rotate response back to center it on lowerBound
-    correctIndex = int(round((0+lowerBound)/step))
+    correctIndex = int(round((0+lowerEdge)/step))
     yZero = np.roll(yZero, correctIndex)
 
     # Compute responses centered on each delta_i
     indexDiff = np.zeros(M)
     for i in range(M):
         if i == 0:
-            indexDiff[i] = (delta[i] - lowerBound)
+            indexDiff[i] = (delta[i] - lowerEdge)
         else:
             indexDiff[i] = delta[i] - delta[i-1]
         indexDiff[i] = round(int((indexDiff[i])/step))
@@ -193,16 +195,55 @@ def cost_function_alt(deltaDiff):
         y += yComp
 
     # Obtain Cost function parameters
-    maxVal    = np.max(y)
-    dropIndex = np.argwhere(y > 0.8*maxVal)
+    # maxVal    = np.max(y)
+    # dropIndex = np.argwhere(y > 0.8*maxVal)
 
-    bandwidth = np.squeeze(x[dropIndex[-1]] - x[dropIndex[0]])
-    yBW = y[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
-    xBW = x[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
+    # Choose dropoff points as delta[0] and delta[-1]
+    dropoffLeft  = []
+    dropoffRight = []
+    tol = 1e-11
+    while np.shape(dropoffLeft)[0] == 0 or np.shape(dropoffRight)[0] == 0:
+        dropoffLeft  = np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[0],
+                                  atol=tol))
+        dropoffRight = np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[-1],
+                                  atol=tol))
+        tol = tol*10
+        if tol >= 1:
+            return np.inf
 
+    dropoffLeft  = np.squeeze(dropoffLeft )
+    dropoffRight = np.squeeze(dropoffRight)
 
-    ripple = np.max(yBW) - np.min(yBW)
-    del x, y, xBW, yBW, yZero, yComp
+    if np.ndim(dropoffLeft) > 0:
+        dropoffLeft   = np.squeeze(dropoffLeft)[0]
+    else:
+        dropoffLeft   = np.squeeze(dropoffLeft)
+
+    if np.ndim(dropoffRight) > 0:
+        dropoffRight  = np.squeeze(dropoffRight)[-1]
+    else:
+        dropoffRight  = np.squeeze(dropoffRight)
+
+    leftBound  = x[dropoffLeft]
+    rightBound = x[dropoffRight]
+
+    # xBW = np.zeros(np.shape(x[dropoffLeft:dropoffRight]))
+    # xBW = x[dropoffLeft:dropoffRight]
+    yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
+    yBW = y[dropoffLeft:dropoffRight]
+
+    bandwidth = rightBound - leftBound
+    ripple    = np.max(yBW) - np.min(yBW)
+
+    # plt.plot(x, y)
+    # print("\nAlt")
+    # print("bandwidth: ", bandwidth)
+    # print("ripple: ", ripple)
+
+    del x, y, yBW, yZero, yComp, leftBound, rightBound, dropoffLeft, dropoffRight,\
+    tol, indexDiff, correctIndex, numPoints, lowerEdge, upperEdge, span, M, delta,\
+    pointDensity, step
+
     return ripple*1e8 - bandwidth
 
 

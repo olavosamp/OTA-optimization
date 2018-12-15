@@ -17,8 +17,11 @@ for i in range(1, M):
 # deltaDiff[-2] = span/2
 
 # result = cost_function_alt(deltaDiff)
-result = cost_function(deltaDiff)
-print(result)
+resultAlt = cost_function(deltaDiff)
+
+# print(result)
+print(resultAlt)
+plt.show()
 exit()
 
 delta = convert_delta(deltaDiff)
