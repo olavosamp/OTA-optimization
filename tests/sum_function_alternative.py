@@ -12,13 +12,6 @@ spacing = 200*span/2
 edge    = (M-1)/2*spacing
 # delta   = np.linspace(-edge,edge, num=M)
 
-# deltaDiff = np.zeros(M)
-# deltaDiff[0] = -edge
-# for i in range(1,M):
-#     deltaDiff[i] = spacing
-# print(deltaDiff)
-# input()
-
 # deltaDiff = [0.6053946, 0.5, 0.5, 0.5]
 deltaDiff = [-1.5]
 for i in range(1, M):
@@ -26,12 +19,6 @@ for i in range(1, M):
 
 delta = convert_delta(deltaDiff)
 
-lowerBound = delta[0]  -2*span
-upperBound = delta[-1] +2*span
-pointDensity = defs.PLOT_POINT_DENSITY
-
-numPoints = round(pointDensity*(upperBound-lowerBound))
-x, step = np.linspace(lowerBound, upperBound, num=numPoints, retstep=True)
 
 x = np.linspace(lowerBound, upperBound, num=int(1e6))
 y = sum_function(x, delta, M=M)

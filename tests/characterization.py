@@ -7,11 +7,16 @@ import libs.defines             as defs
 import libs.dirs                as dirs
 
 
-numPoints = 1e4
-# delta = -0.025
-delta = -defs.DISTANCE_TO_MAX
+numPoints = defs.PLOT_POINT_DENSITY
+delta = 100
+# delta = -defs.DISTANCE_TO_MAX-10
+# delta = 0.6053946
 x = np.linspace(-0.2+delta, 0.2+delta, num=numPoints)
 y = differential_pair_response(x, -delta)
+
+print("Step: {:.2e}".format(x[0]-x[1]))
+print("Y Sum: ",np.sum(y))
+# input()
 
 data = {'x': x,
         'y': y}
@@ -41,7 +46,7 @@ xMeanIndex   = np.squeeze(np.argwhere(np.isclose(y, mean, atol=1e-10)))
 # Compute distance from delta to max value
 distToMax = np.abs(x[xMaxValIndex] - 0)
 print("Distance to max: ", distToMax)
-input()
+# input()
 
 # Filter Bandwidth
 thresholdBW = 0.8*maxVal
@@ -99,6 +104,6 @@ plt.annotate('x = {:.2e}'.format(np.squeeze(x[bwIndex[-1]])), xy=(x[bwIndex[-1]]
               xytext=(4,0), textcoords='offset points')
 
 
-plt.savefig(dirs.figures+"response_characterization.png", orientation='portrait',
-            bbox_inches='tight')
+# plt.savefig(dirs.figures+"response_characterization.png", orientation='portrait',
+#             bbox_inches='tight')
 plt.show()
