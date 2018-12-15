@@ -16,16 +16,16 @@ M = defs.NUM_DIFFERENTIAL_PAIRS
 # Inequality constraints in form
 # f_i(x) >= 0
 # INEQUALITIES TO IMPLEMENT
-#     deltaDiffs[0]  in [-3, 3]
-#     deltaDiffs[1:] in [defs.MIN_DELTA_DIFF_VALUE, defs.SIGNAL_SPAN]
-#     ripple         <= 0.05
-#     bandwidth      in [0.7, 0.9]
+#  [v] deltaDiffs[0]  in [-3, 0]
+#  [v] deltaDiffs[1:] in [defs.MIN_DELTA_DIFF_VALUE, defs.SIGNAL_SPAN]
+#  [x] ripple         <= 0.05
+#  [x] bandwidth      in [0.7, 0.9]
 constraints = [
                {'type':'ineq', # deltaDiff[0] >= -3
                  'fun': lambda x: x[0] +3.
                  },
-               {'type':'ineq', # deltaDiff[0] <= 3 || -deltaDiff[0] +3 >=0
-                'fun': lambda x: -x[0] +3.
+               {'type':'ineq', # deltaDiff[0] <= 0 || -deltaDiff[0] +0 >=0
+                'fun': lambda x: -x[0]
                 },
                {'type':'ineq', # deltaDiff[1:] >= defs.MIN_DELTA_DIFF_VALUE
                 'fun': lambda x: x[1:] - defs.MIN_DELTA_DIFF_VALUE
@@ -33,9 +33,15 @@ constraints = [
                {'type':'ineq', # deltaDiff[1:] <= defs.SIGNAL_SPAN || -deltaDiff[1:] + span >=0
                 'fun': lambda x: -x[1:] + defs.SIGNAL_SPAN
                 },
-               # {'type':'ineq',
-               #  'fun':, lambda x:
-               #  },
+               {'type':'ineq', # ripple <= 0.05 || -ripple +0.05 => 0
+                'fun':, lambda x: -get_ripple_percent(x) + 0.05
+                },
+               {'type':'ineq', # bandwidth <= 0.9 || -bandwidth + 0.9 >= 0
+                'fun':, lambda x: -get_bandwidth(x) +0.9
+                },
+               {'type':'ineq', # bandwidth >= 0.7 || bandwidth - 0.7 >= 0
+                'fun':, lambda x: get_bandwidth(x) -0.7
+                },
 ]
 
 # Initialize variables

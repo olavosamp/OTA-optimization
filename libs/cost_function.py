@@ -158,8 +158,37 @@ def cost_function(deltaDiff):
     del x, y, yBW
     return 1e8*ripple - bandwidth
 
-def cost_function_alt(deltaDiff):
-    delta = convert_delta(deltaDiff)
+
+def get_dropoff_points(x, delta):
+    dropoffLeft  = []
+    dropoffRight = []
+    tol = 1e-11
+    while np.shape(dropoffLeft)[0] == 0 or np.shape(dropoffRight)[0] == 0:
+        dropoffLeft  = np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[0],
+                                  atol=tol))
+        dropoffRight = np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[-1],
+                                  atol=tol))
+        tol = tol*10
+        if tol >= 1:
+            return np.inf
+
+    dropoffLeft  = np.squeeze(dropoffLeft )
+    dropoffRight = np.squeeze(dropoffRight)
+
+    if np.ndim(dropoffLeft) > 0:
+        dropoffLeft   = np.squeeze(dropoffLeft)[0]
+    else:
+        dropoffLeft   = np.squeeze(dropoffLeft)
+
+    if np.ndim(dropoffRight) > 0:
+        dropoffRight  = np.squeeze(dropoffRight)[-1]
+    else:
+        dropoffRight  = np.squeeze(dropoffRight)
+
+    return dropoffLeft, dropoffRight
+
+
+def get_xy(delta):
     M       = np.shape(delta)[0]   # Number of differential pairs
     span    = defs.SIGNAL_SPAN              # Non-zero response width
 
@@ -189,36 +218,17 @@ def cost_function_alt(deltaDiff):
 
         yComp = np.roll(yZero, int(sum(indexDiff[:i+1])))
         y += yComp
+    return x, y
 
-    # Obtain Cost function parameters
-    # maxVal    = np.max(y)
-    # dropIndex = np.argwhere(y > 0.8*maxVal)
+
+def cost_function_alt(deltaDiff):
+    delta = convert_delta(deltaDiff)
+
+    # Get x, y values
+    x, y = get_xy(delta)
 
     # Choose dropoff points as delta[0] and delta[-1]
-    dropoffLeft  = []
-    dropoffRight = []
-    tol = 1e-11
-    while np.shape(dropoffLeft)[0] == 0 or np.shape(dropoffRight)[0] == 0:
-        dropoffLeft  = np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[0],
-                                  atol=tol))
-        dropoffRight = np.argwhere(np.isclose(x, defs.DISTANCE_TO_MAX+ delta[-1],
-                                  atol=tol))
-        tol = tol*10
-        if tol >= 1:
-            return np.inf
-
-    dropoffLeft  = np.squeeze(dropoffLeft )
-    dropoffRight = np.squeeze(dropoffRight)
-
-    if np.ndim(dropoffLeft) > 0:
-        dropoffLeft   = np.squeeze(dropoffLeft)[0]
-    else:
-        dropoffLeft   = np.squeeze(dropoffLeft)
-
-    if np.ndim(dropoffRight) > 0:
-        dropoffRight  = np.squeeze(dropoffRight)[-1]
-    else:
-        dropoffRight  = np.squeeze(dropoffRight)
+    dropoffLeft, dropoffRight = get_dropoff_points(x, delta)
 
     leftBound  = x[dropoffLeft]
     rightBound = x[dropoffRight]
@@ -228,19 +238,48 @@ def cost_function_alt(deltaDiff):
     yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
     yBW = y[dropoffLeft:dropoffRight]
 
-    bandwidth = rightBound - leftBound
-    ripple    = np.max(yBW) - np.min(yBW)
+    bandwidth     = delta[-1] - delta[0]
 
-    # plt.plot(x, y)
+    if np.max(yBW) == 0:
+        return np.inf
+    ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
+
+    plt.plot(x, y)
     # print("\nAlt")
-    # print("bandwidth: ", bandwidth)
-    # print("ripple: ", ripple)
+    print("bandwidth:  ", bandwidth)
+    # print("bandwidth2: ", delta[-1] - delta[0])
+    print("ripple: ", ripplePercent)
 
-    del x, y, yBW, yZero, yComp, leftBound, rightBound, dropoffLeft, dropoffRight,\
-    tol, indexDiff, correctIndex, numPoints, lowerEdge, upperEdge, span, M, delta,\
-    pointDensity, step
+    del x, y, yBW, leftBound, rightBound, dropoffLeft, dropoffRight
 
-    return ripple*1e8 - bandwidth
+    return ripplePercent - bandwidth
+
+
+def get_ripple_percent(deltaDiff):
+    delta = convert_delta(deltaDiff)
+
+    # Get x, y values
+    x, y = get_xy(delta)
+
+    # Choose dropoff points as delta[0] and delta[-1]
+    dropoffLeft, dropoffRight = get_dropoff_points(x, delta)
+
+    yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
+    yBW = y[dropoffLeft:dropoffRight]
+
+    if np.max(yBW) == 0:
+        return np.inf
+
+    ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
+    return ripplePercent
+
+
+def get_bandwidth(deltaDiff):
+    delta = convert_delta(deltaDiff)
+    bandwidth = delta[-1] - delta[0]
+    assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
+
+    return bandwidth
 
 
 def convert_delta(deltaDiff):

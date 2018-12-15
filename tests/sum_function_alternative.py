@@ -16,8 +16,10 @@ for i in range(1, M):
     deltaDiff.append(0.4)
 # deltaDiff[-2] = span/2
 
-# result = cost_function_alt(deltaDiff)
-resultAlt = cost_function(deltaDiff)
+resultAlt = cost_function_alt(deltaDiff)
+print("ripple F: ", get_ripple_percent(deltaDiff))
+print("bandwidth F: ", get_bandwidth(deltaDiff))
+# result = cost_function(deltaDiff)
 
 # print(result)
 print(resultAlt)
