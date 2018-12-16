@@ -27,7 +27,7 @@ convexConstraints = [
                    #  'fun': lambda x: -x[1:] + (defs.SIGNAL_SPAN - 1e-9)
                    #  },
                    {'type':'ineq', # ripple <= 0.5 || -ripple +0.5 => 0
-                    'fun': lambda x: -get_ripple_percent(x) + 0.20
+                    'fun': lambda x: -get_ripple_percent(x) + 0.30
                     },
                    {'type':'ineq', # bandwidth <= 0.9 || -bandwidth + 0.9 >= 0
                     # 'fun': lambda x: -get_bandwidth(x) +(defs.MAX_BW_VALUE/defs.MAX_BW_VALUE - 1e-9)

@@ -10,12 +10,12 @@ import libs.dirs                as dirs
 M       = defs.NUM_DIFFERENTIAL_PAIRS   # Number of differential pairs
 span    = defs.SIGNAL_SPAN              # Non-zero response width
 
-deltaDiff = [-1.,   0.05099223,  0.04889312,  0.05028007,  0.05155574,  0.04952145,
-  0.04975524,  0.05064246 , 0.0493633,   0.05008275,  0.05013026,  0.04869392,
-  0.04921992,  0.05098836 , 0.05094915,  0.05021183,  0.04942693]
-# deltaDiff = [-1.]
-# for i in range(1, M):
-#     deltaDiff.append(1e-3)
+# deltaDiff = [-1.,   0.05099223,  0.04889312,  0.05028007,  0.05155574,  0.04952145,
+#   0.04975524,  0.05064246 , 0.0493633,   0.05008275,  0.05013026,  0.04869392,
+#   0.04921992,  0.05098836 , 0.05094915,  0.05021183,  0.04942693]
+deltaDiff = [-1.]
+for i in range(1, M):
+    deltaDiff.append(defs.MIN_DELTA_DIFF_VALUE)
     # deltaDiff.append(0)
 
 resultAlt = cost_function_alt(deltaDiff)
@@ -23,92 +23,33 @@ print("ripple F: ", get_ripple_percent(deltaDiff))
 print("bandwidth F: ", get_bandwidth(deltaDiff))
 print(resultAlt)
 
-x, y = get_xy(convert_delta(deltaDiff))
-plt.plot(x, y)
-plt.show()
-exit()
-
 delta = convert_delta(deltaDiff)
+x, y = get_xy(delta)
+# plt.plot(x, y)
+# plt.show()
+# exit()
 
-lowerBound = delta[0]  -2*span
-upperBound = delta[-1] +2*span
-pointDensity = defs.PLOT_POINT_DENSITY
-numPoints = int(np.clip(pointDensity*(upperBound-lowerBound), 2**20+1, 2**25+1))
+dropoffLeft, dropoffRight = get_dropoff_points(x, delta)
 
-x, step   = np.linspace(lowerBound, upperBound, num=numPoints, retstep=True)
-y = np.zeros(np.shape(x))
-
-# Compute differential pair response centered on zero
-yZero = differential_pair_response(x, 0)
-print("\nNum Points: ", numPoints)
-print("Base: {:.4e}".format(spi.romb(yZero, dx=step)))
-
-# Rotate response back to center it on lowerBound
-correctIndex = int(round((0+lowerBound)/step))
-yZero = np.roll(yZero, correctIndex)
-
-print(delta)
-# Compute responses centered on each delta_i
-indexDiff = np.zeros(M)
-for i in range(M):
-    if i == 0:
-        indexDiff[i] = (delta[i] - lowerBound)
-    else:
-        indexDiff[i] = delta[i] - delta[i-1]
-    indexDiff[i] = round(int((indexDiff[i])/step))
-
-    yComp = np.roll(yZero, int(sum(indexDiff[:i+1])))
-    y += yComp
-
-    # print("{:.4e}".format(spi.romb(yComp, dx=step)))
-    # plt.plot(x, yComp)
-    # plt.show()
-
-plt.plot(x, y)
-plt.show()
-
-print("x ", x.shape)
-print("y ", y.shape)
-print(lowerBound)
-print(upperBound)
 
 fig = plt.figure(figsize=(20,10))
 plt.plot(x,y)
-plt.xlim(lowerBound, upperBound)
+plt.xlim(x[dropoffLeft]-0.2, x[dropoffRight]+0.2)
 
 plt.xlabel("Tensão (V)")
 plt.ylabel("Corrente (A)")
+
+
+# Plot bandwidth limits
+plt.axvline(x=x[dropoffRight], color='k', label='Limites de Banda')
+plt.axvline(x=x[dropoffLeft ], color='k')
+plt.legend()
+
+# for deltai in delta:
+#     plt.plot(x, differential_pair_response(x, deltai))
+
 plt.show()
-
-# Obtain Cost function parameters
-maxVal    = np.max(y)
-dropIndex = np.argwhere(y > 0.8*maxVal)
-
-bandwidth = np.squeeze(x[dropIndex[-1]] - x[dropIndex[0]])
-yBW = y[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
-xBW = x[np.squeeze(dropIndex[0]):np.squeeze(dropIndex[-1])]
-
-# # Plot bandwidth limited signal
-# plt.plot(xBW,yBW)
-
-for deltai in delta:
-    plt.plot(x, differential_pair_response(x, deltai))
-
-ripple = np.max(yBW) - np.min(yBW)
-
-print("Limit Left: ", x[dropIndex[0]])
-print("Limit Right: ", x[dropIndex[-1]])
-
-print("Limit Left  Defs: ", defs.RIPPLE_DROPOFF_LEFT)
-print("Limit Right Defs: ", defs.RIPPLE_DROPOFF_RIGHT)
-print("")
-
-print("Bandwidth: ", bandwidth)
-print("Ripple: ", ripple)
-print("f_0(delta) = ", ripple - bandwidth)
-
-print("Encapsulated cost function")
-print("Cost function: ", cost_function(delta))
+exit()
 
 plt.savefig(dirs.figures+"response_sum.png", orientation='portrait',
             bbox_inches='tight')

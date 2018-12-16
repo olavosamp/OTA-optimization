@@ -25,16 +25,18 @@ constraints = convexConstraints
 
 # Initialize variables
 deltaDiff0 = np.zeros(M)
-maxVal = defs.MIN_DELTA_DIFF_VALUE/defs.MAX_BW_VALUE+3e-3
-minVal = defs.MIN_DELTA_DIFF_VALUE
+# maxVal = defs.MIN_DELTA_DIFF_VALUE/defs.MAX_BW_VALUE+3e-3
+maxVal = defs.MIN_DELTA_DIFF_VALUE+1.2e-2
+minVal = defs.MIN_DELTA_DIFF_VALUE+1e-3
+# minVal = 0
 while True:
     deltaDiff0[0] = -1.
-    deltaDiff0[1:] = np.random.random(M-1)*(maxVal - minVal) + minVal
+    deltaDiff0[1:] = minVal
+    # deltaDiff0[1:] = np.ones(M-1)*np.random.random(1)*(maxVal - minVal) + minVal
     print("Min: ", minVal)
     print("Max: ", maxVal)
     print("Ripple:    ", get_ripple_percent(deltaDiff0))
     print("Bandwidth: ", get_bandwidth(deltaDiff0))
-    break
     if constraint_test(deltaDiff0, constraints) == True:
         delta = convert_delta(deltaDiff0)
         # break
@@ -43,5 +45,11 @@ while True:
         print(maxVal-minVal)
         input()
     else:
-        # maxVal += 1e-5
-        minVal += 1e-5
+        maxVal += 1e-4
+        # minVal += 1e-3
+
+# deltaDiff0 = np.zeros(M)
+# maxVal = defs.MIN_DELTA_DIFF_VALUE/defs.MAX_BW_VALUE +3e-3
+# minVal = defs.MIN_DELTA_DIFF_VALUE
+# deltaDiff0[0] = -1.
+# deltaDiff0[1:] = np.random.random(M-1)*(maxVal - minVal) + minVal

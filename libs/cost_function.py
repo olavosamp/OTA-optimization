@@ -261,7 +261,10 @@ def cost_function_alt(deltaDiff):
 
     if np.max(yBW) == 0:
         return np.inf
-    ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
+    rippleMean    = np.mean(yBW)
+    ripple        = np.max(np.abs(yBW - rippleMean))
+    ripplePercent = ripple/rippleMean
+    # ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
 
     # plt.plot(x, y)
     # print("\nAlt")
@@ -290,7 +293,10 @@ def get_ripple_percent(deltaDiff):
     if np.max(yBW) == 0:
         return np.inf
 
-    ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
+    # ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
+    rippleMean    = np.mean(yBW)
+    ripple        = np.max(np.abs(yBW - rippleMean))
+    ripplePercent = ripple/rippleMean
     del x, y, yBW
     return ripplePercent
 
