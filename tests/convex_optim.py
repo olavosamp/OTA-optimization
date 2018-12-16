@@ -10,6 +10,8 @@ import libs.defines         as defs
 import libs.dirs            as dirs
 from libs.utils             import *
 
+np.random.seed(17)
+
 # Problem data.
 M = defs.NUM_DIFFERENTIAL_PAIRS
 
@@ -42,7 +44,9 @@ print("Constraint test:")
 print("deltaDiff: ", deltaDiff0)
 print("Initial Delta: ", convert_delta(deltaDiff0))
 print(constraint_test(deltaDiff0, constraints))
+print("")
 
+print("\nStarting optimization")
 opts = {'disp':True}
 def call_func(xk, convergence=0):
     print("Delta: ", xk)
@@ -61,7 +65,7 @@ print("Bandwidth: ", get_bandwidth(deltaDiffOpt))
 # input()
 
 plot_results(deltaDiffOpt)
-save_results(deltaDiffOpt, result.nfev, optimizer='SLSQP')
+save_results(deltaDiffOpt, result.nfev, optimizer='SLSQP_'+defs.NUM_DIFFERENTIAL_PAIRS)
 
 ## Results
 # x* = [0.05, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]

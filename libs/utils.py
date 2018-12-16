@@ -19,7 +19,7 @@ def plot_results(deltaDiff):
 
     rippleIndex = np.argmax(np.abs(yBW - rippleMean))
 
-    fig = plt.figure(figsize=(18,9))
+    fig = plt.figure(figsize=(10,5))
 
     plt.plot(x, y)
     plt.xlabel("Tensão (V)")
@@ -37,9 +37,9 @@ def plot_results(deltaDiff):
     plt.axvline(x=x[dropoffLeft ], color='k')
     plt.legend()
 
-    plt.savefig(dirs.figures+"result.png", orientation='portrait',
+    plt.savefig(dirs.figures+"result_"+defs.NUM_DIFFERENTIAL_PAIRS+".png", orientation='portrait',
                 bbox_inches='tight')
-    plt.savefig(dirs.figures+"result.eps", orientation='portrait',
+    plt.savefig(dirs.figures+"result_"+defs.NUM_DIFFERENTIAL_PAIRS+".eps", orientation='portrait',
                 bbox_inches='tight')
     plt.show()
 
@@ -55,7 +55,7 @@ def save_results(deltaDiff, fevals, optimizer='COBYLA'):
     data = {'Delta': delta,
             'M': M,
             'Otimizador': optimizer,
-            'Banda': bandwith,
+            'Banda': bandwith*defs.MAX_BW_VALUE,
             'Ripple': ripple,
             'FEvals': fevals,
             'f(x)': fOpt,
