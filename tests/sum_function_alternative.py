@@ -10,19 +10,21 @@ import libs.dirs                as dirs
 M       = defs.NUM_DIFFERENTIAL_PAIRS   # Number of differential pairs
 span    = defs.SIGNAL_SPAN              # Non-zero response width
 
-# deltaDiff = [0.6053946, 0.5, 0.5, 0.5]
-deltaDiff = [0.09247358]
-for i in range(1, M):
-    deltaDiff.append(0.4)
-# deltaDiff[-2] = span/2
+deltaDiff = [-1.00004489,  0.07892077,  0.07892077,  0.07892077,  0.07892077,  0.07892077,
+  0.07892077,  0.07892077,  0.07892077,  0.07892077]
+
+# deltaDiff = [-1.]
+# for i in range(1, M):
+#     deltaDiff.append(1e-3)
+    # deltaDiff.append(0)
 
 resultAlt = cost_function_alt(deltaDiff)
 print("ripple F: ", get_ripple_percent(deltaDiff))
 print("bandwidth F: ", get_bandwidth(deltaDiff))
-# result = cost_function(deltaDiff)
-
-# print(result)
 print(resultAlt)
+
+x, y = get_xy(convert_delta(deltaDiff))
+plt.plot(x, y)
 plt.show()
 exit()
 

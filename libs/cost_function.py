@@ -1,6 +1,7 @@
 import numpy as np
 import libs.defines             as defs
-import matplotlib.pyplot as plt
+import matplotlib.pyplot        as plt
+import scipy.integrate          as spi
 
 
 def differential_pair_response(x, delta):
@@ -172,6 +173,12 @@ def get_dropoff_points(x, delta):
         if tol >= 1:
             return np.inf
 
+    # maxVal = np.max(y)
+    # dropoffLeft  = y[y>0.8*maxVal][0]
+    # yDrop = y[x > delta[0]]
+    # dropoffRight = y[y>0.8*maxVal]
+
+
     dropoffLeft  = np.squeeze(dropoffLeft )
     dropoffRight = np.squeeze(dropoffRight)
 
@@ -185,6 +192,8 @@ def get_dropoff_points(x, delta):
     else:
         dropoffRight  = np.squeeze(dropoffRight)
 
+    del x, delta
+
     return dropoffLeft, dropoffRight
 
 
@@ -192,8 +201,8 @@ def get_xy(delta):
     M       = np.shape(delta)[0]   # Number of differential pairs
     span    = defs.SIGNAL_SPAN              # Non-zero response width
 
-    lowerEdge   = delta[0]  -2*span
-    upperEdge   = delta[-1] +2*span
+    lowerEdge    = delta[0]  -3*span
+    upperEdge    = delta[-1] +3*span
     pointDensity = defs.PLOT_POINT_DENSITY
     numPoints    = int(np.clip(pointDensity*(upperEdge-lowerEdge), 2**20+1, 2**25+1))
 
@@ -217,12 +226,21 @@ def get_xy(delta):
         indexDiff[i] = round(int((indexDiff[i])/step))
 
         yComp = np.roll(yZero, int(sum(indexDiff[:i+1])))
+        funcSum = spi.romb(yComp, dx=step)
+        if funcSum < 1e-12:
+            raise ValueError("Function returned null signal.")
+        # print("{:.4e}".format(funcSum))
+
         y += yComp
+
+    # plt.plot(x, y)
+    # plt.show()
     return x, y
 
 
 def cost_function_alt(deltaDiff):
     delta = convert_delta(deltaDiff)
+    # print(delta)
 
     # Get x, y values
     x, y = get_xy(delta)
@@ -238,17 +256,17 @@ def cost_function_alt(deltaDiff):
     yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
     yBW = y[dropoffLeft:dropoffRight]
 
-    bandwidth     = delta[-1] - delta[0]
+    bandwidth     = (delta[-1] - delta[0])/defs.MAX_BW_VALUE
 
     if np.max(yBW) == 0:
         return np.inf
     ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
 
-    plt.plot(x, y)
+    # plt.plot(x, y)
     # print("\nAlt")
-    print("bandwidth:  ", bandwidth)
+    # print("bandwidth:  ", bandwidth)
     # print("bandwidth2: ", delta[-1] - delta[0])
-    print("ripple: ", ripplePercent)
+    # print("ripple: ", ripplePercent)
 
     del x, y, yBW, leftBound, rightBound, dropoffLeft, dropoffRight
 
@@ -271,19 +289,20 @@ def get_ripple_percent(deltaDiff):
         return np.inf
 
     ripplePercent = (np.max(yBW) - np.min(yBW))/np.max(yBW)
+    del x, y, yBW
     return ripplePercent
 
 
 def get_bandwidth(deltaDiff):
     delta = convert_delta(deltaDiff)
-    bandwidth = delta[-1] - delta[0]
+    bandwidth = (delta[-1] - delta[0])/defs.MAX_BW_VALUE
     assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
 
     return bandwidth
 
 
 def convert_delta(deltaDiff):
-    deltaDiff[1:] = np.clip(deltaDiff[1:], defs.MIN_DELTA_DIFF_VALUE, None)
+    # deltaDiff[1:] = np.clip(deltaDiff[1:], defs.MIN_DELTA_DIFF_VALUE, None)
 
     deltaLen = len(deltaDiff)
     delta = np.zeros(deltaLen)

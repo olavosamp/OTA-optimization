@@ -24,26 +24,36 @@ constraints = [
                {'type':'ineq', # deltaDiff[0] >= -3
                  'fun': lambda x: x[0] +3.
                  },
-               {'type':'ineq', # deltaDiff[0] <= 3 || -deltaDiff[0] +3 >=0
-                'fun': lambda x: -x[0] +3.
+               {'type':'ineq', # deltaDiff[0] <= 0 || -deltaDiff[0] +0 >=0
+                'fun': lambda x: -x[0]
                 },
-               {'type':'ineq', # deltaDiff[1:] >= 0
-                'fun': lambda x: x[1:]
+               {'type':'ineq', # deltaDiff[1:] >= defs.MIN_DELTA_DIFF_VALUE
+                'fun': lambda x: x[1:] - defs.MIN_DELTA_DIFF_VALUE
                 },
                {'type':'ineq', # deltaDiff[1:] <= defs.SIGNAL_SPAN || -deltaDiff[1:] + span >=0
                 'fun': lambda x: -x[1:] + defs.SIGNAL_SPAN
                 },
-               # {'type':'ineq',
-               #  'fun':, lambda x:
+               # {'type':'ineq', # ripple <= 0.5 || -ripple +0.5 => 0
+               #  'fun': lambda x: -get_ripple_percent(x) + 0.5
                #  },
+               {'type':'ineq', # bandwidth <= 0.9 || -bandwidth + 0.9 >= 0
+                'fun': lambda x: -get_bandwidth(x) +defs.MAX_BW_VALUE
+                },
+               {'type':'ineq', # bandwidth >= 0.7 || bandwidth - 0.7 >= 0
+                # 'fun': lambda x: get_bandwidth(x) -0.7
+                'fun': lambda x: get_bandwidth(x) - 0.7/defs.MAX_BW_VALUE
+                },
 ]
+
 
 # Initialize variables
 deltaDiff0 = np.zeros(M)
-deltaDiff0[0] = np.random.random()*(3 +3) - 3
-deltaDiff0[1:] = np.random.random(M-1)*(defs.SIGNAL_SPAN - 0) + 0
+deltaDiff0[0] = np.random.random()*(0 +3) - 3
+limitInit = (defs.MAX_BW_VALUE)/(M-1)
+deltaDiff0[1:] = np.random.random(M-1)*(limitInit - defs.MIN_DELTA_DIFF_VALUE) + defs.MIN_DELTA_DIFF_VALUE
 
 print(deltaDiff0)
+print(limitInit)
 for cons in constraints:
     func = cons['fun']
     print(func(deltaDiff0) >= 0)

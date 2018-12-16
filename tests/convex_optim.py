@@ -5,8 +5,10 @@ import cvxpy                as cp
 import scipy.optimize       as spo
 
 from libs.cost_function     import *
+from libs.constraints       import convexConstraints, constraint_test
 import libs.defines         as defs
 import libs.dirs            as dirs
+
 
 
 # Problem data.
@@ -18,36 +20,40 @@ M = defs.NUM_DIFFERENTIAL_PAIRS
 # INEQUALITIES TO IMPLEMENT
 #  [v] deltaDiffs[0]  in [-3, 0]
 #  [v] deltaDiffs[1:] in [defs.MIN_DELTA_DIFF_VALUE, defs.SIGNAL_SPAN]
-#  [x] ripple         <= 0.05
+#  [x] ripple         <= 0.5
 #  [x] bandwidth      in [0.7, 0.9]
-constraints = [
-               {'type':'ineq', # deltaDiff[0] >= -3
-                 'fun': lambda x: x[0] +3.
-                 },
-               {'type':'ineq', # deltaDiff[0] <= 0 || -deltaDiff[0] +0 >=0
-                'fun': lambda x: -x[0]
-                },
-               {'type':'ineq', # deltaDiff[1:] >= defs.MIN_DELTA_DIFF_VALUE
-                'fun': lambda x: x[1:] - defs.MIN_DELTA_DIFF_VALUE
-                },
-               {'type':'ineq', # deltaDiff[1:] <= defs.SIGNAL_SPAN || -deltaDiff[1:] + span >=0
-                'fun': lambda x: -x[1:] + defs.SIGNAL_SPAN
-                },
-               {'type':'ineq', # ripple <= 0.05 || -ripple +0.05 => 0
-                'fun':, lambda x: -get_ripple_percent(x) + 0.05
-                },
-               {'type':'ineq', # bandwidth <= 0.9 || -bandwidth + 0.9 >= 0
-                'fun':, lambda x: -get_bandwidth(x) +0.9
-                },
-               {'type':'ineq', # bandwidth >= 0.7 || bandwidth - 0.7 >= 0
-                'fun':, lambda x: get_bandwidth(x) -0.7
-                },
-]
+constraints = convexConstraints
 
 # Initialize variables
-deltaDiff0 = np.zeros(M)
-deltaDiff0[0] = np.random.random()*(3 +3) - 3
-deltaDiff0[1:] = np.random.random(M-1)*(defs.SIGNAL_SPAN - defs.MIN_DELTA_DIFF_VALUE) + defs.MIN_DELTA_DIFF_VALUE
+# deltaDiff0 = np.zeros(M)
+# while True:
+#     deltaDiff0[0] = -1.
+#     limitInit = (defs.MAX_BW_VALUE)/(M-1)
+#
+#     deltaDiff0[1:] = np.random.random(M-1)*(limitInit - defs.MIN_DELTA_DIFF_VALUE) + defs.MIN_DELTA_DIFF_VALUE
+#     print(delta)
+#     print("Min: ", defs.MIN_DELTA_DIFF_VALUE)
+#     print("Max: ", limitInit)
+    # if constraint_test(deltaDiff0, constraints) == True:
+    #     pass
+
+
+deltaDiff0 = [-1.]
+for i in range(1, M):
+    deltaDiff0.append(defs.MIN_DELTA_DIFF_VALUE +1e-6)
+deltaDiff0 = np.array(deltaDiff0)
+
+# deltaDiff0    = np.zeros(M)
+# deltaDiff0[0] = -1.
+# deltaDiff0[1:] = np.random.random(M-1)*(defs.MAX_DELTA_DIFF_VALUE - defs.MIN_DELTA_DIFF_VALUE) + defs.MIN_DELTA_DIFF_VALUE
+
+# resultFeasible = spo.minimize(lambda x: 1, np.zeros(), constraints=constraints, options=opts)
+
+print("Constraint test:")
+print("deltaDiff: ", deltaDiff0)
+print("Initial Delta: ", convert_delta(deltaDiff0))
+print(constraint_test(deltaDiff0, constraints))
+# exit()
 
 opts = {'disp':True}
 def call_func(xk, convergence=0):
@@ -56,9 +62,15 @@ def call_func(xk, convergence=0):
     # print("f(x): {:.2e}\n".format(cost_function(xk)))
 result = spo.minimize(cost_function_alt, deltaDiff0, constraints=constraints, options=opts,
                         callback=call_func)
-print(result.x)
-print(result.fun)
-print(result.nfev)
+print("Minimization finished. Results:")
+print("x*:     ", result.x)
+print("f(x*):  ", result.fun)
+print("FEvals: ", result.nfev)
+input()
+# deltaDiffOpt = result.x
+# x, y = get_xy(deltaDiffOpt)
+# plt.plot(x, y)
+# plt.show()
 
 ## Results
 # x* = [0.05, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
