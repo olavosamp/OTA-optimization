@@ -22,7 +22,8 @@ maxVal = defs.MIN_DELTA_DIFF_VALUE+1.2e-2
 minVal = defs.MIN_DELTA_DIFF_VALUE+1e-3
 while True:
     deltaDiff0[0] = -1.
-    deltaDiff0[1:] = np.ones(M-1)*np.random.random(1)*(maxVal - minVal) + minVal
+    deltaDiff0[1:] = np.random.random(M-1)*(maxVal - minVal) + minVal
+    # deltaDiff0[1:] = np.ones(M-1)*np.random.random(1)*(maxVal - minVal) + minVal
     print("Min: ", minVal)
     print("Max: ", maxVal)
     print("Ripple:    ", get_ripple_percent(deltaDiff0))

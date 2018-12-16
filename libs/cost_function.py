@@ -242,6 +242,8 @@ def get_xy(delta):
 def cost_function_alt(deltaDiff):
     delta = convert_delta(deltaDiff)
     # print(delta)
+    if (delta[1:] > 1).any():
+        return np.inf
 
     # Get x, y values
     x, y = get_xy(delta)
