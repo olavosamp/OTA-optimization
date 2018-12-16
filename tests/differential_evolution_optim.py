@@ -5,6 +5,7 @@ import cvxpy                as cp
 import scipy.optimize       as spo
 
 from libs.cost_function     import *
+from libs.constraints       import convexConstraints, constraint_test
 import libs.defines         as defs
 import libs.dirs            as dirs
 
@@ -15,7 +16,7 @@ M = defs.NUM_DIFFERENTIAL_PAIRS
 ## SCIPY
 bounds = [(-1.,0.)]
 for i in range(1,M):
-    bounds.append((defs.MIN_DELTA_DIFF_VALUE, defs.MAX_DELTA_DIFF_VALUE))
+    bounds.append((defs.MIN_DELTA_DIFF_VALUE, defs.MIN_DELTA_DIFF_VALUE+3e-3))
 
 def call_func(xk, convergence=0):
     print("Delta: ", xk)
