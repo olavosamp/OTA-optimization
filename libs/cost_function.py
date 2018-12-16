@@ -204,7 +204,8 @@ def get_xy(delta):
     lowerEdge    = delta[0]  -3*span
     upperEdge    = delta[-1] +3*span
     pointDensity = defs.PLOT_POINT_DENSITY
-    numPoints    = int(np.clip(pointDensity*(upperEdge-lowerEdge), 2**20+1, 2**25+1))
+    # numPoints    = int(np.clip(pointDensity*(upperEdge-lowerEdge), 2**20+1, 2**25+1))
+    numPoints = 2**20 + 1
 
     x, step   = np.linspace(lowerEdge, upperEdge, num=numPoints, retstep=True)
     y = np.zeros(np.shape(x))
@@ -256,7 +257,7 @@ def cost_function_alt(deltaDiff):
     yBW = np.zeros(np.shape(y[dropoffLeft:dropoffRight]))
     yBW = y[dropoffLeft:dropoffRight]
 
-    bandwidth     = (delta[-1] - delta[0])/defs.MAX_BW_VALUE
+    bandwidth     = (delta[-1] - delta[0])/(defs.MAX_BW_VALUE - defs.MIN_BW_VALUE)
 
     if np.max(yBW) == 0:
         return np.inf
@@ -270,7 +271,8 @@ def cost_function_alt(deltaDiff):
 
     del x, y, yBW, leftBound, rightBound, dropoffLeft, dropoffRight
 
-    return ripplePercent - bandwidth
+    # return 2*ripplePercent - bandwidth
+    return ripplePercent
 
 
 def get_ripple_percent(deltaDiff):
@@ -295,7 +297,7 @@ def get_ripple_percent(deltaDiff):
 
 def get_bandwidth(deltaDiff):
     delta = convert_delta(deltaDiff)
-    bandwidth = (delta[-1] - delta[0])/defs.MAX_BW_VALUE
+    bandwidth = (delta[-1] - delta[0])/(defs.MAX_BW_VALUE)
     assert bandwidth >= 0, "Negative bandwidth: Deltas must be in crescent order."
 
     return bandwidth

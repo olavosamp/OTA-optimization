@@ -77,7 +77,7 @@ plt.plot(x,y)
 plt.xlim(lowerBound, upperBound)
 
 plt.xlabel("Tensão (V)")
-plt.ylabel("Transcondutância (gm)")
+plt.ylabel("Corrente (A)")
 plt.show()
 
 # Obtain Cost function parameters

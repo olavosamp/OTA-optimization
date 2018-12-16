@@ -23,6 +23,8 @@ def call_func(xk, convergence=0):
     print("")
     # print("f(x): {:.2e}\n".format(cost_function(xk)))
 result = spo.differential_evolution(cost_function_alt, bounds, disp=True, callback=call_func)
+
+constraints = convexConstraints
 print("Minimization finished. Results:")
 print("x*:     ", result.x)
 print("f(x*):  ", result.fun)

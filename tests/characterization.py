@@ -58,11 +58,12 @@ print("Bandwidth: {:12.2e} V".format( bandwidth))
 
 
 # Plot response
-fig = plt.figure(figsize=(20,12))
+fig = plt.figure(figsize=(10,5))
 plt.plot(x, y, 'b', label='Sinal')
 plt.title("Resposta do Par Diferencial com deslocamento {:.2e}".format(delta))
 plt.xlabel("Tensão (V)")
-plt.ylabel("Transcondutância (gm)")
+# plt.ylabel("Transcondutância (gm)")
+plt.ylabel("Corrente (A)")
 
 
 # Compute ripple limit points
@@ -74,7 +75,7 @@ dropoffRight  = x[dropoffIndex[-1]]
 print("Ripple dropoff Left: ", dropoffLeft[0])
 print("Ripple dropoff Right: ", dropoffRight[0])
 
-plt.plot(x[dropoffIndex], y[dropoffIndex], 'rx', label='Pontos de queda do ripple')
+# plt.plot(x[dropoffIndex], y[dropoffIndex], 'rx', label='Pontos de queda do ripple')
 
 # Plot a vertical line through maxVal
 plt.axvline(x=x[xMaxValIndex], color='r', label='Ponto Máximo')
@@ -93,15 +94,15 @@ plt.annotate('{:.2e}'.format(np.squeeze(y[xMaxValIndex])), xy=(x[xMaxValIndex], 
               xytext=(2,4), textcoords='offset points')
 # Mean value line
 plt.annotate('{:.2e}'.format(np.squeeze(y[xMeanIndex[0]])), xy=(x[xMeanIndex[0]], y[xMeanIndex[0]]),
-              xytext=(100,4), textcoords='offset points')
+              xytext=(70,4), textcoords='offset points')
 # Left ripple point
 plt.annotate('x = {:.2e}'.format(np.squeeze(x[bwIndex[0]])), xy=(x[bwIndex[0]], y[bwIndex[0]]),
-              xytext=(-68,0), textcoords='offset points')
+              xytext=(-72,0), textcoords='offset points')
 # Right ripple point
 plt.annotate('x = {:.2e}'.format(np.squeeze(x[bwIndex[-1]])), xy=(x[bwIndex[-1]], y[bwIndex[-1]]),
-              xytext=(4,0), textcoords='offset points')
+              xytext=(6,0), textcoords='offset points')
 
 
-# plt.savefig(dirs.figures+"response_characterization.png", orientation='portrait',
-#             bbox_inches='tight')
+plt.savefig(dirs.figures+"response_characterization.eps", orientation='portrait',
+            bbox_inches='tight')
 plt.show()
