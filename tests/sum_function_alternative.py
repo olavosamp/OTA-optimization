@@ -10,9 +10,9 @@ import libs.dirs                as dirs
 M       = defs.NUM_DIFFERENTIAL_PAIRS   # Number of differential pairs
 span    = defs.SIGNAL_SPAN              # Non-zero response width
 
-deltaDiff = [-1.00004489,  0.07892077,  0.07892077,  0.07892077,  0.07892077,  0.07892077,
-  0.07892077,  0.07892077,  0.07892077,  0.07892077]
-
+deltaDiff = [-1.,   0.05099223,  0.04889312,  0.05028007,  0.05155574,  0.04952145,
+  0.04975524,  0.05064246 , 0.0493633,   0.05008275,  0.05013026,  0.04869392,
+  0.04921992,  0.05098836 , 0.05094915,  0.05021183,  0.04942693]
 # deltaDiff = [-1.]
 # for i in range(1, M):
 #     deltaDiff.append(1e-3)

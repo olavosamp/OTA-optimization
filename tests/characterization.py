@@ -8,8 +8,8 @@ import libs.dirs                as dirs
 
 
 numPoints = defs.PLOT_POINT_DENSITY
-delta = 100
-# delta = -defs.DISTANCE_TO_MAX-10
+# delta = 100
+delta = -defs.DISTANCE_TO_MAX
 x = np.linspace(-0.2+delta, 0.2+delta, num=numPoints)
 y = differential_pair_response(x, -delta)
 

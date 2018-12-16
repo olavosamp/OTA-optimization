@@ -6,7 +6,7 @@ RIPPLE_DROPOFF_RIGHT     = 0.04170417                        # used to bound rip
 PLOT_POINT_DENSITY       = 1e4                               # Point density used to approximate
                                                              # signal response
 
-NUM_DIFFERENTIAL_PAIRS   = 10                                # Not actually a constant. Number
+NUM_DIFFERENTIAL_PAIRS   = 17                                # Not actually a constant. Number
                                                              # of differential pairs used
 
 DISTANCE_TO_MAX          = 0.02618261826182619               # Distance from delta to max index,

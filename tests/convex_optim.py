@@ -26,26 +26,37 @@ constraints = convexConstraints
 
 # Initialize variables
 # deltaDiff0 = np.zeros(M)
+# maxVal = defs.MIN_DELTA_DIFF_VALUE +3e-3
+# minVal = defs.MIN_DELTA_DIFF_VALUE
 # while True:
 #     deltaDiff0[0] = -1.
-#     limitInit = (defs.MAX_BW_VALUE)/(M-1)
+#     deltaDiff0[1:] = np.random.random(M-1)*(maxVal - minVal) + minVal
+#     # print(delta)
+#     print("Min: ", minVal)
+#     print("Max: ", maxVal)
+#     if constraint_test(deltaDiff0, constraints) == False:
+#         delta = convert_delta(deltaDiff0)
+#         print(deltaDiff0)
+#         print(delta)
+#         print(maxVal-minVal)
+#         input()
+#     else:
+#         maxVal += 1e-5
+#         # minVal += 1e-5
 #
-#     deltaDiff0[1:] = np.random.random(M-1)*(limitInit - defs.MIN_DELTA_DIFF_VALUE) + defs.MIN_DELTA_DIFF_VALUE
-#     print(delta)
-#     print("Min: ", defs.MIN_DELTA_DIFF_VALUE)
-#     print("Max: ", limitInit)
-    # if constraint_test(deltaDiff0, constraints) == True:
-    #     pass
+#
+#
+# exit()
+# deltaDiff0 = [-1.]
+# for i in range(1, M):
+#     deltaDiff0.append(defs.MIN_DELTA_DIFF_VALUE +1e-9)
+# deltaDiff0 = np.array(deltaDiff0)
 
-
-deltaDiff0 = [-1.]
-for i in range(1, M):
-    deltaDiff0.append(defs.MIN_DELTA_DIFF_VALUE +1e-6)
-deltaDiff0 = np.array(deltaDiff0)
-
-# deltaDiff0    = np.zeros(M)
-# deltaDiff0[0] = -1.
-# deltaDiff0[1:] = np.random.random(M-1)*(defs.MAX_DELTA_DIFF_VALUE - defs.MIN_DELTA_DIFF_VALUE) + defs.MIN_DELTA_DIFF_VALUE
+deltaDiff0 = np.zeros(M)
+maxVal = defs.MIN_DELTA_DIFF_VALUE +3e-3
+minVal = defs.MIN_DELTA_DIFF_VALUE
+deltaDiff0[0] = -1.
+deltaDiff0[1:] = np.random.random(M-1)*(maxVal - minVal) + minVal
 
 # resultFeasible = spo.minimize(lambda x: 1, np.zeros(), constraints=constraints, options=opts)
 
@@ -66,6 +77,7 @@ print("Minimization finished. Results:")
 print("x*:     ", result.x)
 print("f(x*):  ", result.fun)
 print("FEvals: ", result.nfev)
+print("Constraint Test:\n", constraint_test(result.x, constraints))
 input()
 # deltaDiffOpt = result.x
 # x, y = get_xy(deltaDiffOpt)

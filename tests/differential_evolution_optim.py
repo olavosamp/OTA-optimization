@@ -13,19 +13,21 @@ import libs.dirs            as dirs
 M = defs.NUM_DIFFERENTIAL_PAIRS
 
 ## SCIPY
-bounds = [(-3.,3.)]
+bounds = [(-1.,0.)]
 for i in range(1,M):
-    bounds.append((0,defs.SIGNAL_SPAN))
+    bounds.append((defs.MIN_DELTA_DIFF_VALUE, defs.MAX_DELTA_DIFF_VALUE))
 
 def call_func(xk, convergence=0):
     print("Delta: ", xk)
     print("")
     # print("f(x): {:.2e}\n".format(cost_function(xk)))
 result = spo.differential_evolution(cost_function_alt, bounds, disp=True, callback=call_func)
-print(result.x)
-print(result.f)
-print(result.nfev)
-
+print("Minimization finished. Results:")
+print("x*:     ", result.x)
+print("f(x*):  ", result.fun)
+print("FEvals: ", result.nfev)
+print("Constraint Test:\n", constraint_test(result.x, constraints))
+input()
 ## Result DE
 # x* = [0.09247358, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
 # f(x*) = -6.29
