@@ -37,9 +37,9 @@ def plot_results(deltaDiff):
     plt.axvline(x=x[dropoffLeft ], color='k')
     plt.legend()
 
-    plt.savefig(dirs.figures+"result_"+defs.NUM_DIFFERENTIAL_PAIRS+".png", orientation='portrait',
+    plt.savefig(dirs.figures+"result_"+str(defs.NUM_DIFFERENTIAL_PAIRS)+".png", orientation='portrait',
                 bbox_inches='tight')
-    plt.savefig(dirs.figures+"result_"+defs.NUM_DIFFERENTIAL_PAIRS+".eps", orientation='portrait',
+    plt.savefig(dirs.figures+"result_"+str(defs.NUM_DIFFERENTIAL_PAIRS)+".eps", orientation='portrait',
                 bbox_inches='tight')
     plt.show()
 

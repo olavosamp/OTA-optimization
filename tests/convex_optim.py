@@ -52,7 +52,7 @@ def call_func(xk, convergence=0):
     print("Delta: ", xk)
     print("")
     # print("f(x): {:.2e}\n".format(cost_function(xk)))
-result = spo.minimize(cost_function_alt, deltaDiff0,method='SLSQP', constraints=constraints, options=opts,
+result = spo.minimize(cost_function_alt, deltaDiff0,method='COBYLA', constraints=constraints, options=opts,
                         callback=call_func)
 deltaDiffOpt = result.x
 print("Minimization finished. Results:")
@@ -65,7 +65,7 @@ print("Bandwidth: ", get_bandwidth(deltaDiffOpt))
 # input()
 
 plot_results(deltaDiffOpt)
-save_results(deltaDiffOpt, result.nfev, optimizer='SLSQP_'+defs.NUM_DIFFERENTIAL_PAIRS)
+save_results(deltaDiffOpt, result.nfev, optimizer='COBYLA_'+str(defs.NUM_DIFFERENTIAL_PAIRS))
 
 ## Results
 # x* = [0.05, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4]
